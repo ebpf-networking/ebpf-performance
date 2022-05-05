@@ -1,0 +1,5 @@
+#!/bin/bash
+docker build container
+docker login
+docker tag iperf3 tjcw/iperf3
+docker push tjcw/iperf3
