@@ -1,0 +1,6 @@
+#!/bin/bash
+echo "Iperf3 running"
+iperf3 -s -p 5000
+echo "Iperf3 finished, sleeping"
+sleep 3600
+#/app/MontyHall
