@@ -1,0 +1,9 @@
+#!/bin/bash
+docker login
+docker tag iperf3 tjcw/iperf3
+docker push tjcw/iperf3
+docker pull tjcw/iperf3
+kubectl create deployment iperf3 --image=tjcw/iperf3
+kubectl expose deploy iperf3 --type=NodePort --port 5000 --target-port 5000
+kubectl apply -f deploy_iperf3.yml
+kubectl apply -f deploy_iperf3-vm3.yml
