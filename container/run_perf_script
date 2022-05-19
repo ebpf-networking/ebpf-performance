@@ -1,2 +1,2 @@
 #!/bin/bash
-perf script >perf.log
+perf script | ./stackcollapse-perf.pl | ./flamegraph.pl >perf.svg

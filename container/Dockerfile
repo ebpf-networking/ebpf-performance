@@ -16,7 +16,11 @@ RUN apt-get update
 #RUN apt-get -y install debian-goodies
 #RUN find-dbgsym-packages iperf3
 RUN apt-get -y install iperf3-dbgsym libc6-dbg libiperf0-dbgsym libsctp1-dbgsym
+RUN apt-get -y install perl
+COPY stackcollapse-perf.pl ./
+COPY flamegraph.pl ./
 RUN ls -l /usr/bin/perf
 COPY run_iperf3 ./
+COPY run_perf_script ./
 EXPOSE 5000
 CMD [ "/app/run_iperf3" ]
