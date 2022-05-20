@@ -17,6 +17,8 @@ RUN apt-get update
 #RUN find-dbgsym-packages iperf3
 RUN apt-get -y install iperf3-dbgsym libc6-dbg libiperf0-dbgsym libsctp1-dbgsym
 RUN apt-get -y install perl
+RUN apt-get -y install jq
+RUN apt-get -y install inetutils-ping
 COPY stackcollapse-perf.pl ./
 COPY flamegraph.pl ./
 RUN ls -l /usr/bin/perf

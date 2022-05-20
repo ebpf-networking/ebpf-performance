@@ -1,2 +1,5 @@
 #!/bin/bash
-kubectl exec -it iperf3-vm2 -- iperf3 -c 10.244.2.2 -p 5000
+ipq=$(kubectl get pods iperf3-vm3 -o json|jq ".status.podIP")
+ipq1=${ipq#\"}
+ip=${ipq1%\"}
+kubectl exec -it iperf3-vm2 -- iperf3 -c $ip -p 5000
