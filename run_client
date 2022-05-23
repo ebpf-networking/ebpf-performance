@@ -1,2 +1,5 @@
 #!/bin/bash
-kubectl run -ti pod2 --image=networkstatic/iperf3 --overrides='{"spec": { "nodeSelector": {"kubernetes.io/hostname": "kind-worker"}}}' --command -- iperf3 -c 10.244.2.4
+ipq=$(kubectl get pods pod1 -o json|jq ".status.podIP")
+ipq1=${ipq#\"}
+ip=${ipq1%\"}
+kubectl run -ti pod2 --image=networkstatic/iperf3 --overrides='{"spec": { "nodeSelector": {"kubernetes.io/hostname": "kind-worker"}}}' --command -- iperf3 -c $ip
