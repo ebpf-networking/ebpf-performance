@@ -1,0 +1,2 @@
+#!/bin/bash
+kubectl run -ti pod1 --image=networkstatic/iperf3 --overrides='{"spec": { "nodeSelector": {"kubernetes.io/hostname": "tjcw-kube-2"}}}' --command -- iperf3 -s

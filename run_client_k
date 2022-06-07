@@ -1,0 +1,5 @@
+#!/bin/bash
+ipq=$(kubectl get pods pod1 -o json|jq ".status.podIP")
+ipq1=${ipq#\"}
+ip=${ipq1%\"}
+kubectl run -ti pod2 --image=networkstatic/iperf3 --overrides='{"spec": { "nodeSelector": {"kubernetes.io/hostname": "tjcw-kube-1"}}}' --command -- iperf3 -c $ip
