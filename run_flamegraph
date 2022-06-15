@@ -1,0 +1,26 @@
+#!/bin/bash
+function run_server()
+{
+  kubectl run pod1 --image=networkstatic/iperf3 --overrides='{"spec": { "nodeSelector": {"kubernetes.io/hostname": "kind-worker"}}}' --command -- iperf3 -s 
+}
+
+function run_client()
+{
+  ipq=$(kubectl get pods pod1 -o json|jq ".status.podIP")
+  ipq1=${ipq#\"}
+  ip=${ipq1%\"}
+  kubectl run pod2 --image=networkstatic/iperf3 --overrides='{"spec": { "nodeSelector": {"kubernetes.io/hostname": "kind-worker"}}}' --command -- iperf3 -c $ip -t 70
+}
+
+sudo sh -c "echo 0  > /proc/sys/kernel/kptr_restrict"
+sudo sh -c "echo -1 > /proc/sys/kernel/perf_event_paranoid"
+run_server
+sleep 10
+run_client
+sleep 5
+perf record -g -a sleep 60
+sleep 20
+perf script|container/stackcollapse-perf.pl|container/flamegraph.pl >flamegraph.svg
+kubectl logs pod2 --tail=10
+kubectl delete pod pod1
+kubectl delete pod pod2
