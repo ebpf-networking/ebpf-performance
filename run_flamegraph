@@ -18,7 +18,9 @@ run_server
 sleep 10
 run_client
 sleep 5
-perf record -g -a sleep 60
+perf record -g -a sleep 60 &
+vmstat 60 2
+wait
 sleep 20
 perf script|container/stackcollapse-perf.pl|container/flamegraph.pl >flamegraph.svg
 kubectl logs pod2 --tail=10
