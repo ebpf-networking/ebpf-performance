@@ -1,7 +1,7 @@
 #!/bin/bash -x
 function run_server()
 {
-  kubectl run pod1 --image=networkstatic/iperf3 --overrides='{"spec": { "nodeSelector": {"kubernetes.io/hostname": "tjcw-kube-1"}}}' --command -- iperf3 -s 
+  kubectl run pod1 --image=networkstatic/iperf3 --overrides="{\"spec\": { \"nodeSelector\": {\"kubernetes.io/hostname\": \"$1\"}}}" --command -- iperf3 -s 
 }
 
 function run_client()
@@ -9,7 +9,7 @@ function run_client()
   ipq=$(kubectl get pods pod1 -o json|jq ".status.podIP")
   ipq1=${ipq#\"}
   ip=${ipq1%\"}
-  kubectl run pod2 --image=networkstatic/iperf3 --overrides='{"spec": { "nodeSelector": {"kubernetes.io/hostname": "tjcw-kube-2"}}}' --command -- iperf3 -c $ip -t 70
+  kubectl run pod2 --image=networkstatic/iperf3 --overrides="{\"spec\": { \"nodeSelector\": {\"kubernetes.io/hostname\": \"$1\"}}}" --command -- iperf3 -c $ip -t 70
 }
 
 function hostip_of()
@@ -27,13 +27,17 @@ function uid_of()
   uid=${uidq1%\"}
   echo $uid
 }
+server_hostname=$1
+client_hostname=$2
+output_dir=$3
+mkdir -p ${output_dir}
 #sudo sh -c "echo 0  > /proc/sys/kernel/kptr_restrict"
 #sudo sh -c "echo -1 > /proc/sys/kernel/perf_event_paranoid"
-run_server
+run_server ${server_hostname}
 server_hostip=$(hostip_of pod1)
 server_uid=$(uid_of pod1)
 sleep 10
-run_client
+run_client ${client_hostname}
 client_hostip=$(hostip_of pod2)
 client_uid=$(uid_of pod2)
 sleep 5
@@ -45,12 +49,17 @@ wait
 server_end_cpu=$(ssh -n ${server_hostip} cat /sys/fs/cgroup/cpuacct/kubepods/besteffort/pod${server_uid}/cpuacct.usage)
 client_end_cpu=$(ssh -n ${client_hostip} cat /sys/fs/cgroup/cpuacct/kubepods/besteffort/pod${client_uid}/cpuacct.usage)
 sleep 20
-kubectl logs pod1 --tail=10
-ssh -n ${server_hostip} ~/workspace/ebpf-performance/generate_flamegraph >server-flamegraph.svg
-ssh -n ${client_hostip} ~/workspace/ebpf-performance/generate_flamegraph >client-flamegraph.svg
+kubectl logs pod1 --tail=10 >${output_dir}/server.log
+ssh -n ${server_hostip} ~/workspace/ebpf-performance/generate_flamegraph >${output_dir}/server-flamegraph.svg
+ssh -n ${client_hostip} ~/workspace/ebpf-performance/generate_flamegraph >${output_dir}/client-flamegraph.svg
 typeset -i server_cpu=${server_end_cpu}-${server_start_cpu}
 typeset -i client_cpu=${client_end_cpu}-${client_start_cpu}
-echo "server cpu=${server_cpu}"
-echo "client cpu=${client_cpu}"
+echo "server cpu=${server_cpu}" >${output_dir}/server.cpu
+echo "client cpu=${client_cpu}" >${output_dir}/client.cpu
 kubectl delete pod pod1
 kubectl delete pod pod2
+cd ${output_dir} && (
+  git add .
+  git commit -m Flamegraph
+  git push origin main
+)
