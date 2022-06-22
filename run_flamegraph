@@ -46,8 +46,8 @@ server_end_cpu=$(ssh -n ${server_hostip} cat /sys/fs/cgroup/cpuacct/kubepods/bes
 client_end_cpu=$(ssh -n ${client_hostip} cat /sys/fs/cgroup/cpuacct/kubepods/besteffort/pod${client_uid}/cpuacct.usage)
 sleep 20
 kubectl logs pod1 --tail=10
-ssh -n ${server_hostip} perf script|~/workspace/ebpf-performance/container/stackcollapse-perf.pl|~/workspace/ebpf-performance/container/flamegraph.pl >server-flamegraph.svg
-ssh -n ${client_hostip} perf script|~/workspace/ebpf-performance/container/stackcollapse-perf.pl|~/workspace/ebpf-performance/container/flamegraph.pl >client-flamegraph.svg
+ssh -n ${server_hostip} ~/workspace/ebpf-performance/generate_flamegraph >server-flamegraph.svg
+ssh -n ${client_hostip} ~/workspace/ebpf-performance/generate_flamegraph >client-flamegraph.svg
 typeset -i server_cpu=${server_end_cpu}-${server_start_cpu}
 typeset -i client_cpu=${client_end_cpu}-${client_start_cpu}
 echo "server cpu=${server_cpu}"

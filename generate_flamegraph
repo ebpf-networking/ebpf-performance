@@ -1,2 +1,2 @@
 #!/bin/bash -x
-perf script | ~/workspace/ebpf-performance/container/stackcollapse-perf.pl|~/workspace/ebpf-performance/container/flamegraph.pl
+perf script -i perf.data | ~/workspace/ebpf-performance/container/stackcollapse-perf.pl|~/workspace/ebpf-performance/container/flamegraph.pl
