@@ -52,5 +52,5 @@ typeset -i server_cpu=${server_end_cpu}-${server_start_cpu}
 typeset -i client_cpu=${client_end_cpu}-${client_start_cpu}
 echo "server cpu=${server_cpu}"
 echo "client cpu=${client_cpu}"
-#kubectl delete pod pod1
-#kubectl delete pod pod2
+kubectl delete pod pod1
+kubectl delete pod pod2
