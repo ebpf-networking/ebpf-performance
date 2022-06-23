@@ -56,10 +56,12 @@ typeset -i server_cpu=${server_end_cpu}-${server_start_cpu}
 typeset -i client_cpu=${client_end_cpu}-${client_start_cpu}
 echo "server cpu=${server_cpu}" >${output_dir}/server.cpu
 echo "client cpu=${client_cpu}" >${output_dir}/client.cpu
-#kubectl delete pod pod1
-#kubectl delete pod pod2
-#cd ${output_dir} && (
-#  git add .
-#  git commit -m Flamegraph
-#  git push origin main
-#)
+kubectl delete pod pod1
+kubectl delete pod pod2
+ssh -n ${server_hostip} rm -f perf.data
+ssh -n ${client_hostip} rm -f perf.data
+cd ${output_dir} && (
+  git add .
+  git commit -m Flamegraph
+  git push origin main
+)
