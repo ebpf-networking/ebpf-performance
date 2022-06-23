@@ -4,5 +4,5 @@ then
   cat /sys/fs/cgroup/cpuacct/kubepods/besteffort/pod$1/cpuacct.usage
 else
   altpod=$(echo -n $1|tr '-' '_')
-  cat /sys/fs/cgroup/cpuacct/kubepods.slice/kubepods-besteffort.slice/kubepods-besteffort.pod${altpod}.slice/cpuacct.usage
+  cat /sys/fs/cgroup/cpuacct/kubepods.slice/kubepods-besteffort.slice/kubepods-besteffort-pod${altpod}.slice/cpuacct.usage
 fi

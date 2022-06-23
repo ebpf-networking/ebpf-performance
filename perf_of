@@ -4,6 +4,6 @@ then
   perf record -g -a -o perf.data -e cycles -G kubepods/besteffort/pod$1 sleep 60
 else
   altpod=$(echo -n $1|tr '-' '_')
-  perf record -g -a -o perf.data -e cycles -G kubepods.slice/kubepods-besteffort.slice/kubepods-besteffort.pod${altpod}.slice sleep 60
+  perf record -g -a -o perf.data -e cycles -G kubepods.slice/kubepods-besteffort.slice/kubepods-besteffort-pod${altpod}.slice sleep 60
 fi
 
