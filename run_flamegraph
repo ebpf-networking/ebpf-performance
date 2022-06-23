@@ -41,13 +41,13 @@ run_client ${client_hostname}
 client_hostip=$(hostip_of pod2)
 client_uid=$(uid_of pod2)
 sleep 5
-server_start_cpu=$(ssh -n ${server_hostip} sh -c "cat /sys/fs/cgroup/cpuacct/kubepods*/*besteffort*/pod${server_uid}/cpuacct.usage")
-client_start_cpu=$(ssh -n ${client_hostip} sh -c "cat /sys/fs/cgroup/cpuacct/kubepods*/*besteffort*/pod${client_uid}/cpuacct.usage")
-ssh -n ${server_hostip} sh -c "perf record -g -a -o perf.data -e cycles -G kubepods*/*besteffort*/pod${server_uid} sleep 60" &
-ssh -n ${client_hostip} sh -c "perf record -g -a -o perf.data -e cycles -G kubepods*/*besteffort*/pod${client_uid} sleep 60"
+server_start_cpu=$(ssh -n ${server_hostip} sh -c "cat /sys/fs/cgroup/cpuacct/kubepods*/*besteffort*/*pod${server_uid}/cpuacct.usage")
+client_start_cpu=$(ssh -n ${client_hostip} sh -c "cat /sys/fs/cgroup/cpuacct/kubepods*/*besteffort*/*pod${client_uid}/cpuacct.usage")
+ssh -n ${server_hostip} sh -c "perf record -g -a -o perf.data -e cycles -G kubepods*/*besteffort*/*pod${server_uid} sleep 60" &
+ssh -n ${client_hostip} sh -c "perf record -g -a -o perf.data -e cycles -G kubepods*/*besteffort*/*pod${client_uid} sleep 60"
 wait
-server_end_cpu=$(ssh -n ${server_hostip} sh -c "cat /sys/fs/cgroup/cpuacct/kubepods*/*besteffort*/pod${server_uid}/cpuacct.usage")
-client_end_cpu=$(ssh -n ${client_hostip} sh -c "cat /sys/fs/cgroup/cpuacct/kubepods*/*besteffort*/pod${client_uid}/cpuacct.usage")
+server_end_cpu=$(ssh -n ${server_hostip} sh -c "cat /sys/fs/cgroup/cpuacct/kubepods*/*besteffort*/*pod${server_uid}/cpuacct.usage")
+client_end_cpu=$(ssh -n ${client_hostip} sh -c "cat /sys/fs/cgroup/cpuacct/kubepods*/*besteffort*/*pod${client_uid}/cpuacct.usage")
 sleep 20
 kubectl logs pod1 --tail=10 >${output_dir}/server.log
 ssh -n ${server_hostip} ~/workspace/ebpf-performance/generate_flamegraph >${output_dir}/server-flamegraph.svg
@@ -56,8 +56,8 @@ typeset -i server_cpu=${server_end_cpu}-${server_start_cpu}
 typeset -i client_cpu=${client_end_cpu}-${client_start_cpu}
 echo "server cpu=${server_cpu}" >${output_dir}/server.cpu
 echo "client cpu=${client_cpu}" >${output_dir}/client.cpu
-kubectl delete pod pod1
-kubectl delete pod pod2
+#kubectl delete pod pod1
+#kubectl delete pod pod2
 #cd ${output_dir} && (
 #  git add .
 #  git commit -m Flamegraph
