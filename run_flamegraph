@@ -27,6 +27,12 @@ function uid_of()
   uid=${uidq1%\"}
   echo $uid
 }
+
+function data_of()
+{
+  tail -n 1 $1 |
+	  awk '{if ( $8 == "Mbits/sec") print $7*1e6*60; else if ( $8 == "Gbits/sec" print $7*1e9*60;}'
+}
 server_hostname=$1
 client_hostname=$2
 output_dir=$3
@@ -56,6 +62,9 @@ typeset -i server_cpu=${server_end_cpu}-${server_start_cpu}
 typeset -i client_cpu=${client_end_cpu}-${client_start_cpu}
 echo "server cpu=${server_cpu}" >${output_dir}/server.cpu
 echo "client cpu=${client_cpu}" >${output_dir}/client.cpu
+total_data=data_of ${output_dir}/server.log
+echo "${server_cpu} ${total_data}"|awk '{print $2/$1)' >${output_dir}/server_per_tick
+echo "${client_cpu} ${total_data}"|awk '{print $2/$1)' >${output_dir}/client_per_tick
 kubectl delete pod pod1
 kubectl delete pod pod2
 ssh -n ${server_hostip} rm -f perf.data
