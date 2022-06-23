@@ -46,8 +46,8 @@ client_start_cpu=$(ssh -n ${client_hostip} sh -c "cat /sys/fs/cgroup/cpuacct/kub
 ssh -n ${server_hostip} sh -c "perf record -g -a -o perf.data -e cycles -G kubepods*/*besteffort*/pod${server_uid} sleep 60" &
 ssh -n ${client_hostip} sh -c "perf record -g -a -o perf.data -e cycles -G kubepods*/*besteffort*/pod${client_uid} sleep 60"
 wait
-server_end_cpu=$(ssh -n ${server_hostip} sh -c "cat /sys/fs/cgroup/cpuacct/kubepods*/*besteffort*/pod${server_uid}/cpuacct.usage)"
-client_end_cpu=$(ssh -n ${client_hostip} sh -c "cat /sys/fs/cgroup/cpuacct/kubepods*/*besteffort*/pod${client_uid}/cpuacct.usage)"
+server_end_cpu=$(ssh -n ${server_hostip} sh -c "cat /sys/fs/cgroup/cpuacct/kubepods*/*besteffort*/pod${server_uid}/cpuacct.usage")
+client_end_cpu=$(ssh -n ${client_hostip} sh -c "cat /sys/fs/cgroup/cpuacct/kubepods*/*besteffort*/pod${client_uid}/cpuacct.usage")
 sleep 20
 kubectl logs pod1 --tail=10 >${output_dir}/server.log
 ssh -n ${server_hostip} ~/workspace/ebpf-performance/generate_flamegraph >${output_dir}/server-flamegraph.svg
