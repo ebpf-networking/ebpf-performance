@@ -31,7 +31,7 @@ function uid_of()
 function data_of()
 {
   tail -n 1 $1 |
-	  awk '{if ( $8 == "Mbits/sec") print $7*1e6*60; else if ( $8 == "Gbits/sec" print $7*1e9*60;}'
+	  awk '{if ( $8 == "Mbits/sec") print $7*1e6*60; else if ( $8 == "Gbits/sec") print $7*1e9*60;}'
 }
 server_hostname=$1
 client_hostname=$2
