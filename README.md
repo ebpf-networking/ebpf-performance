@@ -50,9 +50,9 @@ git fetch origin
 git merge --ff-only origin/main
 ```
 and browse to URL `file:///home/tjcw/eclipse-workspace-java/ebpf-performance-results/test-directory/server-flamegraph.svg` or `file:///home/tjcw/eclipse-workspace-java/ebpf-performance-results/test-directory/client-flamegraph.svg` . There are some additional files placed in this directory :
- `client.cpu` : Reported client CPU time for the duration of the test
- `client_per_tick` : Bits transferred per tick of client CPU
- `server.cpu` : Reported server CPU time for the duration of the test
- `server.log` : Last 10 lines of the server iperf3 output
- `server_per_tick` : Bits transferred per tick of server CPU
+- `client.cpu` : Reported client CPU time for the duration of the test
+- `client_per_tick` : Bits transferred per tick of client CPU
+- `server.cpu` : Reported server CPU time for the duration of the test
+- `server.log` : Last 10 lines of the server iperf3 output
+- `server_per_tick` : Bits transferred per tick of server CPU
 
