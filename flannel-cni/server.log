@@ -1,0 +1,10 @@
+[  5]  64.00-65.00  sec   205 MBytes  1.72 Gbits/sec                  
+[  5]  65.00-66.00  sec   208 MBytes  1.74 Gbits/sec                  
+[  5]  66.00-67.00  sec   201 MBytes  1.69 Gbits/sec                  
+[  5]  67.00-68.00  sec   252 MBytes  2.11 Gbits/sec                  
+[  5]  68.00-69.00  sec   198 MBytes  1.66 Gbits/sec                  
+[  5]  69.00-70.00  sec   178 MBytes  1.49 Gbits/sec                  
+[  5]  70.00-70.00  sec   149 KBytes   527 Mbits/sec                  
+- - - - - - - - - - - - - - - - - - - - - - - - -
+[ ID] Interval           Transfer     Bitrate
+[  5]   0.00-70.00  sec  14.4 GBytes  1.76 Gbits/sec                  receiver
