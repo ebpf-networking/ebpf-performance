@@ -2,6 +2,10 @@
 ### Set up 3 machines
  One to be test controller and kubernetes master, the others to be kubernetes workers
  Ubuntu 20.04
+### Install prerequisite software on test controller
+```
+sudo apt-get install jq
+```
 ### Set up a non-root user on each machine
 ### Allow the test controller to 'ssh' to the worker machines
 ### Clone the repositories onto the test controller
