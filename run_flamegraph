@@ -9,7 +9,25 @@ function run_client()
   ipq=$(kubectl get pods pod1 -o json|jq ".status.podIP")
   ipq1=${ipq#\"}
   ip=${ipq1%\"}
-  kubectl run pod2 --image=networkstatic/iperf3 --overrides="{\"spec\": { \"nodeSelector\": {\"kubernetes.io/hostname\": \"$1\"}}}" --command -- iperf3 -c $ip -t 70
+#  kubectl run pod2 --image=networkstatic/iperf3 --overrides="{\"spec\": { \"nodeSelector\": {\"kubernetes.io/hostname\": \"$1\"}}}" --command -- iperf3 -c $ip -t 70
+  cat >client-job.yaml <<EOF
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: iperf3-client
+spec:
+  template:
+    spec:
+      containers:
+      - name: iperf3-client
+        image: networkstatic/iperf3
+        command: ["iperf3", "-c", "$ip", "-t", "70"]
+      nodeName: $1
+      restartPolicy: Never
+  backoffLimit: 4
+EOF
+  kubectl apply -f client-job.yaml
+  client_pod=$(kubectl get pods --selector=job-name=iperf3-client --output=jsonpath='{.items[*].metadata.name}')
 }
 
 function hostip_of()
@@ -42,11 +60,13 @@ mkdir -p ${output_dir}
 run_server ${server_hostname}
 server_hostip=$(hostip_of pod1)
 server_uid=$(uid_of pod1)
-sleep 10
+#sleep 10
+kubectl wait --for=condition=Ready pod/pod1
 run_client ${client_hostname}
-client_hostip=$(hostip_of pod2)
-client_uid=$(uid_of pod2)
-sleep 5
+client_hostip=$(hostip_of ${client_pod})
+client_uid=$(uid_of ${client_pod})
+#sleep 5
+kubectl wait --for=condition=Ready pod/${client_pod}
 server_start_cpu=$(ssh -n ${server_hostip} ~/workspace/ebpf-performance/cpuacct_of ${server_uid})
 client_start_cpu=$(ssh -n ${client_hostip} ~/workspace/ebpf-performance/cpuacct_of ${client_uid})
 ssh -n ${server_hostip} ~/workspace/ebpf-performance/perf_of ${server_uid} &
@@ -56,6 +76,7 @@ server_end_cpu=$(ssh -n ${server_hostip} ~/workspace/ebpf-performance/cpuacct_of
 client_end_cpu=$(ssh -n ${client_hostip} ~/workspace/ebpf-performance/cpuacct_of ${client_uid})
 sleep 20
 kubectl logs pod1 >${output_dir}/server.log
+kubectl logs ${client_pod} >${output_dir}/client.log
 ssh -n ${server_hostip} ~/workspace/ebpf-performance/generate_flamegraph >${output_dir}/server-flamegraph.svg
 ssh -n ${client_hostip} ~/workspace/ebpf-performance/generate_flamegraph >${output_dir}/client-flamegraph.svg
 typeset -i server_cpu=${server_end_cpu}-${server_start_cpu}
@@ -66,7 +87,7 @@ total_data=$(data_of ${output_dir}/server.log)
 echo "${server_cpu} ${total_data}"|awk '{print $2/$1}' >${output_dir}/server_per_tick
 echo "${client_cpu} ${total_data}"|awk '{print $2/$1}' >${output_dir}/client_per_tick
 kubectl delete pod pod1
-kubectl delete pod pod2
+kubectl delete job iperf3-client
 ssh -n ${server_hostip} rm -f perf.data
 ssh -n ${client_hostip} rm -f perf.data
 cd ${output_dir} && (
